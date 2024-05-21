@@ -44,7 +44,6 @@ class CSA(nn.Module):
 class DHP_DARN(nn.Module):
     def __init__(self, config):
         super(DHP_DARN, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
         self.N_Filters      = 64
@@ -62,10 +61,7 @@ class DHP_DARN(nn.Module):
         
 
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
         
         # Concatenating the generated H_UP with P
         x = torch.cat((X_MS_UP, X_PAN.unsqueeze(1)), dim=1)

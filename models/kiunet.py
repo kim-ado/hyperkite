@@ -19,7 +19,6 @@ RELUSLOPE = 0.2
 class kitenet(nn.Module):
     def __init__(self, config):
         super(kitenet, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]+1
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
         self.N_Filters      = 64
@@ -37,10 +36,7 @@ class kitenet(nn.Module):
         self.relu     = nn.LeakyReLU(negative_slope=RELUSLOPE, inplace=True)
         
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
 
         x = torch.cat((X_MS_UP, X_PAN.unsqueeze(1)), dim=1)
 
@@ -59,7 +55,6 @@ class kitenet(nn.Module):
 class kitenetwithskold(nn.Module):
     def __init__(self, config):
         super(kitenetwithskold, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]+1
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
         self.N_Filters      = 64
@@ -86,10 +81,7 @@ class kitenetwithskold(nn.Module):
         self.relu     = nn.LeakyReLU(negative_slope=RELUSLOPE, inplace=True)
         
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bicubic')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
 
         x = torch.cat((X_MS_UP, X_PAN.unsqueeze(1)), dim=1)
 
@@ -114,7 +106,6 @@ class kitenetwithskold(nn.Module):
 class kitenetwithsk(nn.Module):
     def __init__(self, config):
         super(kitenetwithsk, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]+1
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
 
@@ -147,10 +138,7 @@ class kitenetwithsk(nn.Module):
         self.relu     = nn.LeakyReLU(negative_slope=RELUSLOPE, inplace=True)
         
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
 
         x = torch.cat((X_MS_UP, X_PAN.unsqueeze(1)), dim=1)
 
@@ -196,7 +184,6 @@ class kitenetwithsk(nn.Module):
 class kiunet(nn.Module):
     def __init__(self, config):
         super(kiunet, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]+1
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
         self.N_Filters      = 64
@@ -264,10 +251,7 @@ class kiunet(nn.Module):
         
     
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
 
         x = torch.cat((X_MS_UP, X_PAN.unsqueeze(1)), dim=1)
 
@@ -366,7 +350,6 @@ class Attention_block(nn.Module):
 class attentionkitenet(nn.Module):
     def __init__(self, config):
         super(attentionkitenet, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]+1
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
         self.N_Filters      = 64
@@ -386,10 +369,7 @@ class attentionkitenet(nn.Module):
         self.Attention2 = Attention_block(32, 32, 16)
         
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
 
         x = torch.cat((X_MS_UP, X_PAN.unsqueeze(1)), dim=1)
 

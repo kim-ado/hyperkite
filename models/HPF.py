@@ -1,11 +1,8 @@
-from math import ceil
 import torch
 import torch.nn.functional as F
 from torch import nn
 import torch.nn.functional as F
-import math
-import kornia
-from kornia import laplacian
+
 
 BatchNorm2d = nn.BatchNorm2d
 BatchNorm1d = nn.BatchNorm1d
@@ -36,7 +33,6 @@ class RDN(nn.Module):
     def __init__(self, config):
         super(RDN, self).__init__()
         # Parameters
-        self.is_DHP_MS      = config["is_DHP_MS"]
         num_channels = config[config["train_dataset"]]["spectral_bands"]+1
         out_channels   = config[config["train_dataset"]]["spectral_bands"]
         num_features = 32
@@ -71,10 +67,7 @@ class RDN(nn.Module):
         self.out_bn = nn.BatchNorm2d(out_channels)
 
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
         
         print(X_MS_UP.shape)
         x = torch.cat((X_MS_UP, X_PAN.unsqueeze(1)), dim=1)
@@ -95,7 +88,6 @@ class RDN(nn.Module):
 class HPF(nn.Module):
     def __init__(self, config):
         super(HPF, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
         self.N_Filters      = 64
@@ -112,10 +104,7 @@ class HPF(nn.Module):
         self.conv3 = nn.Conv2d(in_channels=self.N_Filters, out_channels=self.out_channels, kernel_size=1)
         
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(4,4), mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
 
         # FEN Layer
         x = X_PAN.unsqueeze(1)

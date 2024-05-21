@@ -18,8 +18,7 @@ import shutil
 import torchvision
 from torch.distributions.uniform import Uniform
 import sys
-import kornia
-from kornia import laplacian, sobel
+
 from scipy.io import savemat
 import torch.nn.functional as F
 from utils.vgg_perceptual_loss import VGGPerceptualLoss, VGG19
@@ -31,7 +30,7 @@ def ensure_dir(file_path):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-__dataset__ = {"pavia_dataset": pavia_dataset, "botswana_dataset": botswana_dataset, "chikusei_dataset": chikusei_dataset, "botswana4_dataset": botswana4_dataset}
+__dataset__ = {"hico_dataset": hico_dataset}
 
 # PARSE THE ARGS
 parser = argparse.ArgumentParser(description='PyTorch Training')
@@ -165,6 +164,7 @@ def train(epoch):
         out         = model(MS_image, PAN_image)
 
         outputs = out["pred"]
+        
 
         ######### Computing loss #########
         # Normal L1 loss
@@ -235,7 +235,6 @@ def test(epoch):
             out     = model(MS_image, PAN_image)
 
             outputs = out["pred"]
-
             # Computing validation loss
             loss        = criterion(outputs, reference)
             test_loss   += loss.item()
@@ -243,9 +242,10 @@ def test(epoch):
             # Scalling
             outputs[outputs<0]      = 0.0
             outputs[outputs>1.0]    = 1.0
-            outputs                 = torch.round(outputs*config[config["train_dataset"]]["max_value"])
-            pred_dic.update({image_dict["imgs"][0].split("/")[-1][:-4]+"_pred": torch.squeeze(outputs).permute(1,2,0).cpu().numpy()})
-            reference               = torch.round(reference.detach()*config[config["train_dataset"]]["max_value"])
+            outputs                 = outputs*config[config["train_dataset"]]["max_value"] # Endre disse avhengig av datasett
+            outputs_transformed     = torch.squeeze(outputs, 0).permute(1,2,0).cpu().numpy()
+            pred_dic.update({image_dict["imgs"][0].split("/")[-1][:-4]+"_pred": outputs_transformed})
+            reference               = reference.detach()*config[config["train_dataset"]]["max_value"] # Endre disse avhengig av datasett
 
         
             ### Computing performance metrics ###

@@ -8,7 +8,6 @@ import torch.nn.functional as F
 class HyperPNN(nn.Module):
     def __init__(self, config):
         super(HyperPNN, self).__init__()
-        self.is_DHP_MS      = config["is_DHP_MS"]
         self.in_channels    = config[config["train_dataset"]]["spectral_bands"]
         self.out_channels   = config[config["train_dataset"]]["spectral_bands"]
         self.factor         = config[config["train_dataset"]]["factor"]
@@ -23,10 +22,7 @@ class HyperPNN(nn.Module):
         self.conv7 = nn.Conv2d(in_channels=self.mid_channels, out_channels=self.out_channels, kernel_size=1)
         self.Sigmoid = nn.Sigmoid()
     def forward(self, X_MS, X_PAN):
-        if not self.is_DHP_MS:
-            X_MS_UP = F.interpolate(X_MS, scale_factor=(self.factor,self.factor),mode ='bilinear')
-        else:
-            X_MS_UP = X_MS
+        X_MS_UP = X_MS
         x = F.relu(self.conv1(X_MS_UP))
         x = F.relu(self.conv2(x))
         x = torch.cat((x, X_PAN.unsqueeze(1)), dim=1)
