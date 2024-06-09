@@ -309,8 +309,10 @@ class kiunet(nn.Module):
         out = self.final(out)
 
         out = out + X_MS_UP
+
+        output = {"pred": out}
         
-        return out
+        return output
 
 class Attention_block(nn.Module):
     """
@@ -390,4 +392,6 @@ class attentionkitenet(nn.Module):
         out = self.relu(F.max_pool2d(self.decoder3(out), 2, 2))
         
         out = out + X_MS_UP
-        return out
+
+        output = {  "pred": x}
+        return output

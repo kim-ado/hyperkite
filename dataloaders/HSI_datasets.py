@@ -18,7 +18,7 @@ class hico_dataset(data.Dataset):
     ):
         self.split  = "train" if is_train else "val"        #Define train and validation splits
         self.config = config                                #Configuration file
-        self.dir = self.config["hico_dataset"]["data_dir"] #Path to Pavia Center dataset 
+        self.dir = self.config["hico_dataset"]["data_dir"] #Path to hico dataset 
         
         if self.split == "val":
             self.file_list = os.path.join(self.dir, f"{self.split}" + ".txt")
@@ -33,7 +33,7 @@ class hico_dataset(data.Dataset):
         self.HR_crop_size = [self.config["hico_dataset"]["HR_size"], self.config["hico_dataset"]["HR_size"]]  #Size of the HR-HSI
 
         cv2.setNumThreads(0)    # to avoid Deadloack  between CV Threads and Pytorch Threads caused in resizing
-        
+        """
         self.files = collections.defaultdict(list)
         for f in self.images:
             self.img_root = self.dir+ "/"+ f+"/"
@@ -48,12 +48,14 @@ class hico_dataset(data.Dataset):
             folder_name = f[:-3]
             image_folder = self.dir + "/" + folder_name + "/" + f
             for subfolder in os.listdir(image_folder):
+                max_value = config["hico_dataset"]["max_value"][folder_name]
                 self.files[self.split].append(
                     {
                         "imgs": image_folder + "/" + subfolder,
+                        "max_value": max_value,
                     }
                 )
-        """
+        
 
     def __len__(self):
         return len(self.files[self.split])
@@ -98,9 +100,10 @@ class hico_dataset(data.Dataset):
         reference   = torch.from_numpy((np.array(reference)/1.0).transpose(2, 0, 1))
         
         # Max Normalization
-        MS_image    = MS_image/self.config["hico_dataset"]["max_value"]
-        PAN_image   = PAN_image/self.config["hico_dataset"]["max_value"]
-        reference   = reference/self.config["hico_dataset"]["max_value"]           
+        max_value = image_dict["max_value"]
+        MS_image    = MS_image/max_value
+        PAN_image   = PAN_image/max_value
+        reference   = reference/max_value         
 
         #If split = "train" and augment = "true" do augmentation
         if self.split == "train" and self.augmentation:

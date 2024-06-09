@@ -41,6 +41,7 @@ parser.add_argument('-r', '--resume', default=None, type=str,
 parser.add_argument('-d', '--device', default=None, type=str,
                            help='indices of GPUs to enable (default: all)')
 parser.add_argument('--local', action='store_true', default=False)
+
 args = parser.parse_args()
 
 # LOADING THE CONFIG FILE
@@ -94,6 +95,8 @@ test_loader = data.DataLoader(
 # INITIALIZATION OF PARAMETERS
 start_epoch = 1
 total_epochs = config["trainer"]["total_epochs"]
+max_values = config['hico_dataset']['max_value']
+
 
 # OPTIMIZER
 if config["optimizer"]["type"] == "SGD":
@@ -226,6 +229,10 @@ def test(epoch):
                 PAN_image, _ = make_patches(PAN_image, patch_size=config["trainer"]["patch_size"])
                 reference, _ = make_patches(reference, patch_size=config["trainer"]["patch_size"])
 
+            # Get the parent folder name
+            grandparent_folder_name = os.path.dirname(os.path.dirname(image_dict["imgs"][0]))
+            max_value = max_values.get(os.path.basename(grandparent_folder_name))
+
             # Inputs and references...
             MS_image    = MS_image.float().cuda()
             PAN_image   = PAN_image.float().cuda()
@@ -242,10 +249,10 @@ def test(epoch):
             # Scalling
             outputs[outputs<0]      = 0.0
             outputs[outputs>1.0]    = 1.0
-            outputs                 = outputs*config[config["train_dataset"]]["max_value"] # Endre disse avhengig av datasett
+            outputs                 = outputs*max_value # Endre disse avhengig av datasett
             outputs_transformed     = torch.squeeze(outputs, 0).permute(1,2,0).cpu().numpy()
             pred_dic.update({image_dict["imgs"][0].split("/")[-1][:-4]+"_pred": outputs_transformed})
-            reference               = reference.detach()*config[config["train_dataset"]]["max_value"] # Endre disse avhengig av datasett
+            reference               = reference.detach()*max_value # Endre disse avhengig av datasett
 
         
             ### Computing performance metrics ###
