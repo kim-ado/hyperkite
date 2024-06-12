@@ -176,27 +176,16 @@ def d_s_r(I_F, I_PAN, S=32):
     return Ds_R_index
 
 def lsr(I_F, I_PAN, S=32):
-    # Vectorization of PAN and fused MS
     IHc = I_PAN.flatten()
     ILRc = I_F.reshape(-1, I_F.shape[2])
 
-    # Multivariate linear regression
     w, _, _, _ = np.linalg.lstsq(ILRc, IHc, rcond=None)
     alpha = np.expand_dims(np.expand_dims(w, axis=0), axis=0)
 
-    # Fitted Least squares intensity
     I_R = np.sum(I_F * np.tile(alpha, (I_F.shape[0], I_F.shape[1], 1)), axis=2)
-
-    # Space-varying least squares error
     err_reg = I_PAN.flatten() - I_R.flatten()
-
-    # Regression residual value
     res = np.sqrt(np.mean(err_reg**2))
-
-    # Coefficient of determination
     cd = 1 - (np.var(err_reg) / np.var(I_PAN.flatten()))
-
-    # Variance of PAN
     var_pan = np.var(I_PAN.flatten())
 
     return w, res, cd, var_pan, err_reg

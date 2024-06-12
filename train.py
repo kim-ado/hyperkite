@@ -204,6 +204,7 @@ def train(epoch):
 
         if i % config["trainer"]["iter_size"] == 0 or i == len(train_loader) - 1:
             optimizer.step()
+            scheduler.step()
             optimizer.zero_grad()
 
     writer.add_scalar('Loss/train', loss, epoch)
@@ -347,7 +348,6 @@ with open(PATH+"/"+"model_summary.txt", 'w+') as f:
 # MAIN LOOP
 best_psnr   =0.0
 for epoch in range(start_epoch, total_epochs):
-    scheduler.step(epoch)
     print("\nTraining Epoch: %d" % epoch)
     train(epoch)
 
