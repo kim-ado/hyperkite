@@ -1,7 +1,7 @@
 {
-    "name": "kitenetwithsk_2500",
-    "experim_name": "Experiments/kitenetwithsk",
-    "model": "kitenetwithsk",
+    "name": "HyperPNN_500000",
+    "experim_name": "Experiments/HyperPNN",
+    "model": "HyperPNN",
     "N_modules": 1,
     "train_dataset": "hico_dataset",
     "is_DHP_MS": true,
@@ -24,7 +24,7 @@
     },
 
     "trainer": {
-        "total_epochs": 556,
+        "total_epochs": 497500,
         "is_small_patch_train": false,
         "patch_size": 85,
         "iter_size": 1,
